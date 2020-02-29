@@ -16,7 +16,7 @@ print("UDP target port:", UDP_PORT)
 sock = socket.socket(socket.AF_INET,  # Internet
                      socket.SOCK_DGRAM)  # UDP
 
-listener = threading.Thread(target=udp_client.udp_listen)
+listener = threading.Thread(target=udp_client.udp_listen, args=[sock])
 listener.start()
 
-udp_client.send_register(USERNAME)
+udp_client.send_register(username=USERNAME, sock=sock, ip=UDP_IP, port=UDP_PORT)

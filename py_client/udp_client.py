@@ -1,22 +1,9 @@
 """ UDP client in python. """
 
-import socket
 
-UDP_IP = "192.168.1.136"
-UDP_PORT = 4446
-
-USERNAME = b"botty_asldkfj"
-
-print("UDP target IP:", UDP_IP)
-print("UDP target port:", UDP_PORT)
-
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-
-
-def send_register(username):
+def send_register(username, sock, ip, port):
     message = b"REGISTER;" + username
-    sock.sendto(message, (UDP_IP, UDP_PORT))
+    sock.sendto(message, (ip, port))
 
 
 def receive_welcome(message):
@@ -35,9 +22,9 @@ def receive_new_game(data):
     pass
 
 
-def udp_listen():
+def udp_listen(sock):
     while True:
-        data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
         print("received message:", data)
         if data.startswith(b"WELCOME;"):
             receive_welcome(data)
