@@ -6,6 +6,12 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
+class UdpClient:
+    """UDP client for playing Connect-N"""
+    def __init__(self, username: str):
+        self._username: str = username
+
+
 def send_register(username, sock, ip, port):
     logging.debug("Registering with server...")
     message = b"REGISTER;" + username
@@ -72,6 +78,6 @@ def udp_listen(sock, username, ip, port):
         elif message[0] == b"TOKEN INSERTED":
             receive_token_inserted(data=message[1:], username=username)
         # error state
-        elif message[3].contains(b"No response for UUID"):
+        elif message[-1].contains(b"No response for UUID"):
             logging.debug("No response error! Restarting client...")
             send_register(username=username, sock=sock, ip=ip, port=port)
