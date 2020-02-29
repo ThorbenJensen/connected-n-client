@@ -29,8 +29,7 @@ def receive_welcome(message):
 
 def receive_new_season(data):
     # Expect: NEW SEASON;$season
-    d = data.split(b";")
-    season = d[1]
+    season = data[0]
     send_join(season)
 
 def receive_new_game(data):
@@ -42,12 +41,14 @@ def udp_listen():
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
         print("received message:", data)
-        if data.startswith(b"WELCOME;"):
-            receive_welcome(data)
-        elif data.startswith(b"NEW SEASON;"):
-            receive_new_season(data)
-        elif data.startswith(b"NEW GAME;"):
-            receive_new_game(data)
+        message = data.split(b";")
+
+        if message[0] == b"WELCOME":
+            receive_welcome(message[1:])
+        elif message[0] == b"NEW SEASON":
+            receive_new_season(message[1:])
+        elif message[0] == b"NEW GAME":
+            receive_new_game(message[1:])
 
 
 listener = threading.Thread(target=udp_listen)
