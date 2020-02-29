@@ -13,12 +13,21 @@ print("UDP target port:", UDP_PORT)
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 
-def register(username):
+def send_register(username):
     message = b"REGISTER;" + username
     sock.sendto(message, (UDP_IP, UDP_PORT))
 
-register(USERNAME)
+def receive_welcome(message):
+    # Expect: WELCOME;$username
+    print("Computer sagt ja.")
+    pass
+
+
+send_register(USERNAME)
+
 
 while True:
     data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
     print("received message:", data)
+    if data.startswith(b"WELCOME;"):
+        receive_welcome(data)
