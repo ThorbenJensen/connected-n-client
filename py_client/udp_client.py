@@ -35,15 +35,15 @@ class UdpClient():
             message = data.split(b";")
 
             if message[0] == b"WELCOME":
-                self.receive_welcome(message[1:])
+                self.receive_welcome(username=message[1])
             elif message[0] == b"NEW SEASON":
-                self.receive_new_season(message[1:])
+                self.receive_new_season(season=message[1])
             elif message[0] == b"NEW GAME":
-                self.receive_new_game(message[1:])
+                self.receive_new_game(opponent=message[1])
             elif message[0] == b"YOURTURN":
-                self.receive_yourturn(message[1:])
+                self.receive_yourturn(token=message[1])
             elif message[0] == b"TOKEN INSERTED":
-                self.receive_token_inserted(data=message[1:])
+                self.receive_token_inserted(player=message[1], column=message[2])
             # error handling
             # elif message[-1].startswith(b"No response for UUID"):
             #     logging.debug("No response error! Restarting client...")
@@ -64,29 +64,26 @@ class UdpClient():
         self._socket.sendto(message, (self._ip, self._port))
 
     # RECEIVING
-    def receive_welcome(self, message):
+    def receive_welcome(self, username: bytes):
         # Expect: WELCOME;$username
         logging.debug("Computer sagt ja.")
 
-    def receive_new_season(self, data: List[bytes]):
+    def receive_new_season(self, season: bytes):
         # Expect: NEW SEASON;$season
-        season = data[0]
         self.send_join(season)
 
-    def receive_new_game(self, data: List[bytes]):
+    def receive_new_game(self, opponent: bytes):
         # Expect: NEW GAME;$opponent
-        self._opponent = data[0]
+        self._opponent = opponent
 
-    def receive_yourturn(self, data: List[bytes]):
+    def receive_yourturn(self, token: bytes):
         # Expect: YOURTURN;$token
-        token = data[0]
         column = random.randrange(0, 7)
         logging.debug(f"Inserting into {column}")
         self.send_insert(column=column, token=token)
 
-    def receive_token_inserted(self, data):
+    def receive_token_inserted(self, player: bytes, column: bytes):
         # Expect: TOKEN INSERTED;$player;$column
-        is_opponent = False if data[0] == self._username else True
-        column = data[1]
+        is_opponent = False if player == self._username else True
         if is_opponent:
             logging.debug(f"Opponent inserted into {column}")
