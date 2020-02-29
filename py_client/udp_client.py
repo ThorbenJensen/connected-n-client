@@ -18,16 +18,20 @@ def send_register(username):
     message = b"REGISTER;" + username
     sock.sendto(message, (UDP_IP, UDP_PORT))
 
+def send_join(season):
+    message = b"JOIN;" + season
+    sock.sendto(message, (UDP_IP, UDP_PORT))
+
 def receive_welcome(message):
     # Expect: WELCOME;$username
     print("Computer sagt ja.")
     pass
 
-
 def receive_new_season(data):
     # Expect: NEW SEASON;$season
-    pass
-
+    d = data.split(b";")
+    season = d[1]
+    send_join(season)
 
 def receive_new_game(data):
     # Expect: NEW GAME;$opponent
