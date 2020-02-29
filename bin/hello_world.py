@@ -6,7 +6,7 @@ from py_client.udp_client import UdpClient
 
 logging.basicConfig(level=logging.DEBUG)
 
-USERNAME = b"botty_asldkfj"
+USERNAME = "botty_asldkfj😃"
 UDP_IP = "192.168.1.136"
 UDP_PORT = 4446
 
