@@ -11,14 +11,13 @@ class UdpClient:
     """UDP client for playing Connect-N"""
 
     def __init__(self, username: str, ip: str, port: int, player: Player):
-#                 reset: Callable,
-#                 getColumn: Callable, actionReceived: Callable):
         self._username: str = username
         self._ip: str = ip
         self._port: int = port
         self._player: Player = player
-        # reserve opponent
+        # reserve fields
         self._opponent = None
+        self._socket = None
         # prepare game
         self.init_socket()
         self.start_listener()
