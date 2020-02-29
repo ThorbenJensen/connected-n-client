@@ -1,75 +1,55 @@
 """ UDP client in python. """
 
-import socket
-import threading
 import random
 
-UDP_IP = "192.168.1.136"
-UDP_PORT = 4446
-
-USERNAME = b"botty_asldkfj"
-
-print("UDP target IP:", UDP_IP)
-print("UDP target port:", UDP_PORT)
-
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-
-def send_register(username):
+def send_register(username, sock, ip, port):
     message = b"REGISTER;" + username
-    sock.sendto(message, (UDP_IP, UDP_PORT))
+    sock.sendto(message, (ip, port))
 
-def send_join(season):
+
+def send_join(season, sock, ip, port):
     message = b"JOIN;" + season
-    sock.sendto(message, (UDP_IP, UDP_PORT))
+    sock.sendto(message, (ip, port))
 
 
-def send_insert(column, token):
+def send_insert(column, token, sock, ip, port):
     message = b"INSERT;" + str(column).encode() + b";" + token
-    sock.sendto(message, (UDP_IP, UDP_PORT))
-    pass
+    sock.sendto(message, (ip, port))
 
 
 def receive_welcome(message):
     # Expect: WELCOME;$username
     print("Computer sagt ja.")
-    pass
 
-def receive_new_season(data):
+def receive_new_season(data, sock, ip, port):
     # Expect: NEW SEASON;$season
     season = data[0]
-    send_join(season)
+    send_join(season, sock, ip, port)
 
 def receive_new_game(data):
     # Expect: NEW GAME;$opponent
     pass
 
 
-def receive_yourturn(data):
+def receive_yourturn(data, sock, ip, port):
     # Expect: YOURTURN;$token
     token = data[0]
     column = random.randrange(0, 7)
-    send_insert(column, token)
+    send_insert(column, token, sock, ip, port)
     pass
 
 
-def udp_listen():
+def udp_listen(sock, ip, port):
     while True:
-        data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
         print("received message:", data)
         message = data.split(b";")
 
         if message[0] == b"WELCOME":
             receive_welcome(message[1:])
         elif message[0] == b"NEW SEASON":
-            receive_new_season(message[1:])
+            receive_new_season(message[1:], sock, ip, port)
         elif message[0] == b"NEW GAME":
             receive_new_game(message[1:])
         elif message[0] == b"YOURTURN":
-            receive_yourturn(message[1:])
-
-
-listener = threading.Thread(target=udp_listen)
-listener.start()
-
-send_register(USERNAME)
+            receive_yourturn(message[1:], sock, ip, port)

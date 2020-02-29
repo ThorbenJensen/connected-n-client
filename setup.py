@@ -6,10 +6,10 @@ setup(
     name="py_client",
     version="0.1.0",
     packages=find_packages(),
-    # scripts=glob("bin/*"),
+    scripts=glob("bin/*"),
     install_requires=[
     ],
     extras_require={
-        "dev": ["black", "jupyter", "pylama", "rope"],
+        "dev": ["black", "pylama", "rope"],
     },
 )
