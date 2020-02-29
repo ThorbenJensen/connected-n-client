@@ -4,6 +4,8 @@ import logging
 import socket
 import threading
 
+from py_client.players import Player
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -67,7 +69,7 @@ class UdpClient:
     def receive_new_game(self, opponent: str):
         # Expect: NEW GAME;$opponent
         self._opponent = opponent
-        self._player.reset();
+        self._player.reset()
 
     def receive_yourturn(self, token: str):
         # Expect: YOURTURN;$token
