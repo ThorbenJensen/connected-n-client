@@ -42,14 +42,24 @@ def receive_yourturn(data, sock, ip, port):
     # Expect: YOURTURN;$token
     token = data[0]
     column = random.randrange(0, 7)
+    logging.debug(f"Inserting into {column}")
     send_insert(column, token, sock, ip, port)
     pass
+
+
+def receive_token_inserted(data):
+    # Expect: TOKEN INSERTED;$player;$column
+    username = b"botty_asldkfjjan"
+    is_opponent = False if data[0] == username else True
+    column = data[1]
+    if is_opponent:
+        logging.debug(f"Opponent inserted into {column}")
 
 
 def udp_listen(sock, ip, port):
     while True:
         data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
-        logging.debug("received message:", data)
+        logging.debug(f"received message: {data}")
         message = data.split(b";")
 
         if message[0] == b"WELCOME":
@@ -62,3 +72,5 @@ def udp_listen(sock, ip, port):
             receive_yourturn(message[1:], sock, ip, port)
         elif message[3].contains(b"No response for UUID"):
             logging.debug("No response error! Restarting client...")
+        elif message[0] == b"TOKEN INSERTED":
+            receive_token_inserted(message[1:])
