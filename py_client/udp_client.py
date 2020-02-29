@@ -1,7 +1,6 @@
 """ UDP client in python. """
 
 import socket
-import threading
 
 UDP_IP = "192.168.1.136"
 UDP_PORT = 4446
@@ -14,9 +13,11 @@ print("UDP target port:", UDP_PORT)
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 
+
 def send_register(username):
     message = b"REGISTER;" + username
     sock.sendto(message, (UDP_IP, UDP_PORT))
+
 
 def receive_welcome(message):
     # Expect: WELCOME;$username
@@ -44,9 +45,3 @@ def udp_listen():
             receive_new_season(data)
         elif data.startswith(b"NEW GAME;"):
             receive_new_game(data)
-
-
-listener = threading.Thread(target=udp_listen)
-listener.start()
-
-send_register(USERNAME)
