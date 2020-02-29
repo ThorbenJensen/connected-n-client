@@ -2,6 +2,7 @@
 
 import random
 
+
 def send_register(username, sock, ip, port):
     message = b"REGISTER;" + username
     sock.sendto(message, (ip, port))
@@ -21,10 +22,12 @@ def receive_welcome(message):
     # Expect: WELCOME;$username
     print("Computer sagt ja.")
 
+
 def receive_new_season(data, sock, ip, port):
     # Expect: NEW SEASON;$season
     season = data[0]
     send_join(season, sock, ip, port)
+
 
 def receive_new_game(data):
     # Expect: NEW GAME;$opponent
