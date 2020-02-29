@@ -4,12 +4,11 @@ import logging
 import random
 import socket
 import threading
-from typing import List
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class UdpClient():
+class UdpClient:
     """UDP client for playing Connect-N"""
 
     def __init__(self, username: str, ip: str, port: int):
@@ -35,54 +34,59 @@ class UdpClient():
             message = data.split(b";")
 
             if message[0] == b"WELCOME":
-                self.receive_welcome(username=message[1])
+                self.receive_welcome(username=message[1].decode())
             elif message[0] == b"NEW SEASON":
-                self.receive_new_season(season=message[1])
+                self.receive_new_season(season=message[1].decode())
             elif message[0] == b"NEW GAME":
-                self.receive_new_game(opponent=message[1])
+                self.receive_new_game(opponent=message[1].decode())
             elif message[0] == b"YOURTURN":
-                self.receive_yourturn(token=message[1])
+                self.receive_yourturn(token=message[1].decode())
             elif message[0] == b"TOKEN INSERTED":
-                self.receive_token_inserted(player=message[1], column=message[2])
+                self.receive_token_inserted(
+                    player=message[1].decode(), column=int(message[2].decode())
+                )
             # error handling
             # elif message[-1].startswith(b"No response for UUID"):
             #     logging.debug("No response error! Restarting client...")
             #     self.send_register()
 
     # SENDING
+    def send_udp_message(self, message: str):
+        self._socket.sendto(message.encode(), (self._ip, self._port))
+
     def send_register(self):
         logging.debug("Registering with server...")
-        message = b"REGISTER;" + self._username
-        self._socket.sendto(message, (self._ip, self._port))
+        message = f"REGISTER;{self._username}"
+        self.send_udp_message(message)
 
     def send_join(self, season):
-        message = b"JOIN;" + season
-        self._socket.sendto(message, (self._ip, self._port))
+        message = f"JOIN;{season}"
+        self.send_udp_message(message)
 
     def send_insert(self, column: int, token):
-        message = b"INSERT;" + str(column).encode() + b";" + token
-        self._socket.sendto(message, (self._ip, self._port))
+        message = f"INSERT;{column};{token}"
+        self.send_udp_message(message)
 
     # RECEIVING
-    def receive_welcome(self, username: bytes):
+    def receive_welcome(self, username: str):
         # Expect: WELCOME;$username
         logging.debug("Computer sagt ja.")
 
-    def receive_new_season(self, season: bytes):
+    def receive_new_season(self, season: str):
         # Expect: NEW SEASON;$season
         self.send_join(season)
 
-    def receive_new_game(self, opponent: bytes):
+    def receive_new_game(self, opponent: str):
         # Expect: NEW GAME;$opponent
         self._opponent = opponent
 
-    def receive_yourturn(self, token: bytes):
+    def receive_yourturn(self, token: str):
         # Expect: YOURTURN;$token
         column = random.randrange(0, 7)
         logging.debug(f"Inserting into {column}")
         self.send_insert(column=column, token=token)
 
-    def receive_token_inserted(self, player: bytes, column: bytes):
+    def receive_token_inserted(self, player: str, column: int):
         # Expect: TOKEN INSERTED;$player;$column
         is_opponent = False if player == self._username else True
         if is_opponent:
