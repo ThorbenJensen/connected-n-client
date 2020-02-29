@@ -17,16 +17,20 @@ class UdpClient:
         self._port: int = port
         # reserve opponent
         self._opponent = None
+        # prepare game
+        self.init_socket()
+        self.start_listener()
 
+    # SETTING UP
     def init_socket(self):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    # LISTENER
     def start_listener(self):
         logging.debug("Starting listerner...")
         listener = threading.Thread(target=self.udp_listen)
         listener.start()
 
+    # LISTENING
     def udp_listen(self):
         while True:
             data, addr = self._socket.recvfrom(1024)  # buffer size is 1024 bytes
@@ -49,23 +53,6 @@ class UdpClient:
             # elif message[-1].startswith(b"No response for UUID"):
             #     logging.debug("No response error! Restarting client...")
             #     self.send_register()
-
-    # SENDING
-    def send_udp_message(self, message: str):
-        self._socket.sendto(message.encode(), (self._ip, self._port))
-
-    def send_register(self):
-        logging.debug("Registering with server...")
-        message = f"REGISTER;{self._username}"
-        self.send_udp_message(message)
-
-    def send_join(self, season):
-        message = f"JOIN;{season}"
-        self.send_udp_message(message)
-
-    def send_insert(self, column: int, token):
-        message = f"INSERT;{column};{token}"
-        self.send_udp_message(message)
 
     # RECEIVING
     def receive_welcome(self, username: str):
@@ -91,3 +78,20 @@ class UdpClient:
         is_opponent = False if player == self._username else True
         if is_opponent:
             logging.debug(f"Opponent inserted into {column}")
+
+    # SENDING
+    def send_udp_message(self, message: str):
+        self._socket.sendto(message.encode(), (self._ip, self._port))
+
+    def send_register(self):
+        logging.debug("Registering with server...")
+        message = f"REGISTER;{self._username}"
+        self.send_udp_message(message)
+
+    def send_join(self, season):
+        message = f"JOIN;{season}"
+        self.send_udp_message(message)
+
+    def send_insert(self, column: int, token):
+        message = f"INSERT;{column};{token}"
+        self.send_udp_message(message)
