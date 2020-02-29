@@ -2,6 +2,7 @@
 
 import socket
 import threading
+import random
 
 UDP_IP = "192.168.1.136"
 UDP_PORT = 4446
@@ -37,6 +38,14 @@ def receive_new_game(data):
     pass
 
 
+def receive_yourturn(data):
+    # Expect: YOURTURN;$token
+    token = data[0]
+    column = random.randrange(0, 7)
+    #send_insert(column, token) #TODO
+    pass
+
+
 def udp_listen():
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
@@ -49,6 +58,8 @@ def udp_listen():
             receive_new_season(message[1:])
         elif message[0] == b"NEW GAME":
             receive_new_game(message[1:])
+        elif message[0] == b"YOURTURN":
+            receive_yourturn(message[1:])
 
 
 listener = threading.Thread(target=udp_listen)
