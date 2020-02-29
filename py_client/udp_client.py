@@ -72,14 +72,14 @@ class UdpClient:
 
     def receive_yourturn(self, token: str):
         # Expect: YOURTURN;$token
-        column = self._player.getColumn() #random.randrange(0, 7)
+        column = self._player.choose_action()
         logging.debug(f"Inserting into {column}")
         self.send_insert(column=column, token=token)
 
     def receive_token_inserted(self, player: str, column: int):
         # Expect: TOKEN INSERTED;$player;$column
         is_opponent = False if player == self._username else True
-        self._player.actionReceived(is_opponent, column)
+        self._player.inform(opponent=is_opponent, column=column)
         if is_opponent:
             logging.debug(f"Opponent inserted into {column}")
 
