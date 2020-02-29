@@ -23,6 +23,13 @@ def send_join(season):
     message = b"JOIN;" + season
     sock.sendto(message, (UDP_IP, UDP_PORT))
 
+
+def send_insert(column, token):
+    message = b"INSERT;" + str(column).encode() + b";" + token
+    sock.sendto(message, (UDP_IP, UDP_PORT))
+    pass
+
+
 def receive_welcome(message):
     # Expect: WELCOME;$username
     print("Computer sagt ja.")
@@ -42,7 +49,7 @@ def receive_yourturn(data):
     # Expect: YOURTURN;$token
     token = data[0]
     column = random.randrange(0, 7)
-    #send_insert(column, token) #TODO
+    send_insert(column, token)
     pass
 
 
