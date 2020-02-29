@@ -1,6 +1,7 @@
 """ General player class. """
 
 import logging
+import random
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -17,6 +18,17 @@ class Player:
             column {int} -- Column of previous move.
             opponent {bool} -- If previous move was taken out by opponent.
         """
+        pass
+
+    def reset(self):
+        pass
+
+
+class RandomPlayer(Player):
+    def choose_action(self) -> int:
+        return random.randrange(0, 7)
+
+    def inform(self, column: int, opponent: bool):
         pass
 
     def reset(self):

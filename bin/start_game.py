@@ -2,15 +2,16 @@
 
 import logging
 
-from example.playerImpl import PlayerImpl
 from py_client.udp_client import UdpClient
+from py_client.players import RandomPlayer
 
 logging.basicConfig(level=logging.DEBUG)
 
 USERNAME = "botty_asldkfj😃"
 UDP_IP = "192.168.1.136"
 UDP_PORT = 4446
-PLAYER = PlayerImpl()
 
-c = UdpClient(username=USERNAME, ip=UDP_IP, port=UDP_PORT, player=PLAYER)
+player = RandomPlayer()
+
+c = UdpClient(username=USERNAME, ip=UDP_IP, port=UDP_PORT, player=player)
 c.send_register()
