@@ -1,1 +1,7 @@
+# IDEs
 *.iml
+.vscode
+
+# python
+env/
+*.egg-info
