@@ -1,9 +1,13 @@
 """ UDP client in python. """
 
 import random
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def send_register(username, sock, ip, port):
+    logging.debug("Registering with server...")
     message = b"REGISTER;" + username
     sock.sendto(message, (ip, port))
 
@@ -20,7 +24,7 @@ def send_insert(column, token, sock, ip, port):
 
 def receive_welcome(message):
     # Expect: WELCOME;$username
-    print("Computer sagt ja.")
+    logging.debug("Computer sagt ja.")
 
 
 def receive_new_season(data, sock, ip, port):
@@ -45,7 +49,7 @@ def receive_yourturn(data, sock, ip, port):
 def udp_listen(sock, ip, port):
     while True:
         data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
-        print("received message:", data)
+        logging.debug("received message:", data)
         message = data.split(b";")
 
         if message[0] == b"WELCOME":
@@ -56,3 +60,5 @@ def udp_listen(sock, ip, port):
             receive_new_game(message[1:])
         elif message[0] == b"YOURTURN":
             receive_yourturn(message[1:], sock, ip, port)
+        elif message[3].contains(b"No response for UUID"):
+            logging.debug("No response error! Restarting client...")

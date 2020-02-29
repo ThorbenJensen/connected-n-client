@@ -1,17 +1,20 @@
 #!/usr/env/python
 
-from py_client import udp_client
-
+import logging
 import socket
 import threading
+
+from py_client import udp_client
+
+logging.basicConfig(level=logging.DEBUG)
 
 UDP_IP = "192.168.1.136"
 UDP_PORT = 4446
 
 USERNAME = b"botty_asldkfj"
 
-print("UDP target IP:", UDP_IP)
-print("UDP target port:", UDP_PORT)
+logging.debug(f"UDP target IP: {UDP_IP}")
+logging.debug(f"UDP target port: {UDP_PORT}")
 
 sock = socket.socket(socket.AF_INET,  # Internet
                      socket.SOCK_DGRAM)  # UDP
