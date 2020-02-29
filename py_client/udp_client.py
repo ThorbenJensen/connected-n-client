@@ -1,7 +1,6 @@
 """ UDP client in python. """
 
 import logging
-import random
 import socket
 import threading
 
@@ -11,10 +10,13 @@ logging.basicConfig(level=logging.DEBUG)
 class UdpClient:
     """UDP client for playing Connect-N"""
 
-    def __init__(self, username: str, ip: str, port: int):
+    def __init__(self, username: str, ip: str, port: int, player: Player):
+#                 reset: Callable,
+#                 getColumn: Callable, actionReceived: Callable):
         self._username: str = username
         self._ip: str = ip
         self._port: int = port
+        self._player: Player = player
         # reserve opponent
         self._opponent = None
         # prepare game
@@ -66,16 +68,18 @@ class UdpClient:
     def receive_new_game(self, opponent: str):
         # Expect: NEW GAME;$opponent
         self._opponent = opponent
+        self._player.reset();
 
     def receive_yourturn(self, token: str):
         # Expect: YOURTURN;$token
-        column = random.randrange(0, 7)
+        column = self._player.getColumn() #random.randrange(0, 7)
         logging.debug(f"Inserting into {column}")
         self.send_insert(column=column, token=token)
 
     def receive_token_inserted(self, player: str, column: int):
         # Expect: TOKEN INSERTED;$player;$column
         is_opponent = False if player == self._username else True
+        self._player.actionReceived(is_opponent, column)
         if is_opponent:
             logging.debug(f"Opponent inserted into {column}")
 
